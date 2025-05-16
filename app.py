@@ -1,13 +1,15 @@
-
 from flask import Flask, render_template, request, redirect, session
 import google.generativeai as genai
 import uuid
+import secrets
+import os
 
 # Gemini API 설정
 genai.configure(api_key="AIzaSyA1c7l0XdkVXJXJmElpkcBlMfsfvLFElG8")
 
-app = Flask(__name__)
-app.secret_key = "your_secret_key"
+# Flask 애플리케이션 설정 (템플릿 폴더 명시)
+app = Flask(__name__, template_folder='.')
+app.secret_key = secrets.token_hex(24)  # 안전한 무작위 비밀 키 생성 및 설정
 
 model = genai.GenerativeModel("models/gemini-pro")  # 정확한 모델명
 
@@ -18,7 +20,7 @@ chat_sessions = {}
 def index():
     history = session.get("history", [])
     turn_count = len(history)
-    return render_template("../index.html", history=history, turn_count=turn_count)
+    return render_template("index.html", history=history, turn_count=turn_count)
 
 @app.route("/ask", methods=["POST"])
 def ask():
