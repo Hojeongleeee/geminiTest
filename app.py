@@ -1,5 +1,4 @@
 
-#  AIzaSyAagNXJMtZENO4c9A5r6lf5UOIsGx9ln7w
 
 from flask import Flask, render_template, request, redirect, session
 import google.generativeai as genai
@@ -9,7 +8,7 @@ import os
 from markdown import markdown  # 마크다운 라이브러리 import
 
 # Gemini API 설정
-genai.configure(api_key="AIzaSyAagNXJMtZENO4c9A5r6lf5UOIsGx9ln7w")  # 실제 API 키로 변경 필요
+genai.configure(api_key="YOUR_API_KEY")  # 실제 API 키로 변경 필요
 
 # Flask 애플리케이션 설정 (템플릿 폴더 명시)
 app = Flask(__name__, template_folder='.')
