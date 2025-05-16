@@ -5,7 +5,7 @@ import secrets
 import os
 
 # Gemini API 설정
-genai.configure(api_key="AIzaSyA1c7l0XdkVXJXJmElpkcBlMfsfvLFElG8")
+genai.configure(api_key="AIzaSyAagNXJMtZENO4c9A5r6lf5UOIsGx9ln7w")
 
 # Flask 애플리케이션 설정 (템플릿 폴더 명시)
 app = Flask(__name__, template_folder='.')
