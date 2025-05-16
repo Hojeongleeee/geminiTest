@@ -18,7 +18,7 @@ chat_sessions = {}
 def index():
     history = session.get("history", [])
     turn_count = len(history)
-    return render_template("index.html", history=history, turn_count=turn_count)
+    return render_template("../index.html", history=history, turn_count=turn_count)
 
 @app.route("/ask", methods=["POST"])
 def ask():
