@@ -5,7 +5,7 @@ import secrets
 import os
 
 # Gemini API 설정
-genai.configure(api_key="AIzaSyAagNXJMtZENO4c9A5r6lf5UOIsGx9ln7w")
+genai.configure(api_key="AIzaSyA1c7l0XdkVXJXJmElpkcBlMfsfvLFElG8")
 
 # Flask 애플리케이션 설정 (템플릿 폴더 명시)
 app = Flask(__name__, template_folder='.')
@@ -16,7 +16,7 @@ model = genai.GenerativeModel("models/gemini-pro")  # 정확한 모델명
 # 메모리 저장소 (간단한 예시)
 chat_sessions = {}
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET", "POST"])  # POST 메소드 추가
 def index():
     history = session.get("history", [])
     turn_count = len(history)
