@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Gemini Chatbot</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="/static/style.css">
     <style>
         /* 기본적인 스타일 (필요에 따라 수정) */
         body { font-family: sans-serif; margin: 20px; }
@@ -34,6 +34,7 @@
             order: 1;
             width: 100%;
             display: none;
+            white-space: pre-wrap; /* 줄바꿈 유지 */
         }
         .tab input:checked + label {
             background-color: #ddd;
@@ -41,6 +42,13 @@
         }
         .tab input:checked ~ .content {
             display: block;
+        }
+        .question {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid #007bff;
+            white-space: pre-wrap;
         }
         @media (min-width: 600px) {
             .tab { width: auto; } /* 넓은 화면에서는 탭 너비 자동 조정 */
@@ -62,12 +70,20 @@
     </div>
 
     <div class="tabs">
-        {% for reply in history %}
-            <div class="tab">
-                <input type="radio" id="tab{{ loop.index0 }}" name="tab-group" {% if loop.first %}checked{% endif %}>
-                <label for="tab{{ loop.index0 }}">응답 {{ loop.index }}</label>
-                <div class="content">{{ reply }}</div>
-            </div>
+        {% for item in history_with_question %}
+            {% if item.type == 'question' %}
+                <div class="tab">
+                    <input type="radio" id="tab{{ loop.index0 }}" name="tab-group" {% if loop.first %}checked{% endif %}>
+                    <label for="tab{{ loop.index0 }}">질문 {{ loop.index // 2 + 1 }}</label>
+                    <div class="content question">{{ item.content }}</div>
+                </div>
+            {% elif item.type == 'answer' %}
+                <div class="tab">
+                    <input type="radio" id="tab{{ loop.index0 }}" name="tab-group">
+                    <label for="tab{{ loop.index0 }}">응답 {{ loop.index // 2 + 1 }}</label>
+                    <div class="content">{{ item.content | markdown | safe }}</div>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 </body>
