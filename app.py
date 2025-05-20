@@ -21,17 +21,6 @@ app.secret_key = secrets.token_hex(24)
 
 model = genai.GenerativeModel("gemini-2.0-flash-001")
 
-def get_session(session_id):
-    response = supabase.table("chat_sessions").select("*").eq("id", session_id).execute()
-
-    if response.status_code == 200 and response.data:
-        print("세션 불러오기 성공:", response.data)
-        return response.data[0]  # 단일 결과 반환
-    else:
-        print("세션 없음 또는 실패:", response.status_code, response.data)
-        return None
-
-
 def save_session(session_id, history):
     data = {
         "id": session_id,
@@ -40,12 +29,24 @@ def save_session(session_id, history):
 
     response = supabase.table("chat_sessions").upsert(data).execute()
 
-    if response.status_code in [200, 201]:
+    if response.error is None:
         print("세션 저장 성공:", response.data)
         return True
     else:
-        print("세션 저장 실패:", response.status_code, response.data)
+        print("세션 저장 실패:", response.error)
         return False
+
+
+def get_session(session_id):
+    response = supabase.table("chat_sessions").select("*").eq("id", session_id).execute()
+
+    if response.error is None and response.data:
+        print("세션 불러오기 성공:", response.data)
+        return response.data[0]  # 리스트에서 첫 번째 항목
+    else:
+        print("세션 없음 또는 실패:", response.error)
+        return None
+
 
     
 
