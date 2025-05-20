@@ -2,4 +2,4 @@ flask
 google-generativeai
 flask-cors
 markdown
-supabase-py
+git+https://github.com/supabase-community/supabase-py.git
