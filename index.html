@@ -101,70 +101,69 @@ p {
   font-size: 1rem;
 }
 
+/* 마크다운 렌더링용 스타일 */
+.message.answer {
+  border-color: #4caf50;
+  background-color: #e8f5e9;
+}
 
-  /* 마크다운 렌더링용 스타일 추가 */
-  .message.answer {
-    border-color: #4caf50;
-    background-color: #e8f5e9;
-  }
+.message.answer p {
+  margin: 0 0 1em 0;
+  line-height: 1.5;
+  color: #2e2e2e;
+}
 
-  /* 마크다운 텍스트 스타일 */
-  .message.answer p {
-    margin: 0 0 1em 0;
-    line-height: 1.5;
-    color: #2e2e2e;
-  }
+.message.answer strong,
+.message.answer b {
+  font-weight: 700;
+}
 
-  .message.answer strong,
-  .message.answer b {
-    font-weight: 700;
-  }
+.message.answer em,
+.message.answer i {
+  font-style: italic;
+}
 
-  .message.answer em,
-  .message.answer i {
-    font-style: italic;
-  }
+.message.answer a {
+  color: #007bff;
+  text-decoration: none;
+}
 
-  .message.answer a {
-    color: #007bff;
-    text-decoration: none;
-  }
-  .message.answer a:hover {
-    text-decoration: underline;
-  }
+.message.answer a:hover {
+  text-decoration: underline;
+}
 
-  .message.answer code {
-    background-color: #eee;
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.9em;
-  }
+.message.answer code {
+  background-color: #eee;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+}
 
-  .message.answer pre {
-    background-color: #333;
-    color: #eee;
-    padding: 10px;
-    border-radius: 5px;
-    overflow-x: auto;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.9em;
-    white-space: pre-wrap; /* 줄바꿈 가능하게 */
-  }
+.message.answer pre {
+  background-color: #333;
+  color: #eee;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  white-space: pre-wrap;
+}
 
-  .message.answer ul,
-  .message.answer ol {
-    margin: 0 0 1em 1.5em;
-  }
+.message.answer ul,
+.message.answer ol {
+  margin: 0 0 1em 1.5em;
+}
 
-  .message.answer blockquote {
-    border-left: 4px solid #4caf50;
-    margin: 0 0 1em 0;
-    padding-left: 15px;
-    color: #555;
-    font-style: italic;
-    background-color: #e8f5e9;
-  }
+.message.answer blockquote {
+  border-left: 4px solid #4caf50;
+  margin: 0 0 1em 0;
+  padding-left: 15px;
+  color: #555;
+  font-style: italic;
+  background-color: #e8f5e9;
+}
 
 /* 반응형 조정 */
 @media (max-width: 768px) {
@@ -222,6 +221,9 @@ p {
 
   <div class="chat-history" id="chat-history"></div>
 
+  <!-- 마크다운 파서 라이브러리 추가 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
   <script>
     const API_URL = "https://geminitest-q151.onrender.com/ask";  // 실제 주소로 변경
     let sessionId = null;
@@ -231,46 +233,49 @@ p {
       const container = document.getElementById("chat-history");
       container.innerHTML = "";
       let turn = 0;
-      history.forEach((item, i) => {
+      history.forEach((item) => {
         const div = document.createElement("div");
         div.className = "message" + (item.type === "answer" ? " answer" : "");
-        div.textContent = item.content;
+        if (item.type === "answer") {
+          div.innerHTML = marked.parse(item.content);  // 마크다운 → HTML 변환
+          turn++;
+        } else {
+          div.textContent = item.content;  // 질문은 그대로 텍스트
+        }
         container.appendChild(div);
-        if (item.type === "answer") turn++;
       });
       document.getElementById("turn-count").textContent = turn;
     }
 
     async function sendQuestion() {
-        const question = document.getElementById("question").value.trim();
-        if (!question || history.length >= 10) return;
+      const question = document.getElementById("question").value.trim();
+      if (!question || history.length >= 10) return;
 
-        try {
-            const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                question: question,
-                session_id: sessionId,
-                history: history
-            })
-            });
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: question,
+            session_id: sessionId,
+            history: history
+          })
+        });
 
-            if (!response.ok) {
-            throw new Error("서버 오류: " + response.status);
-            }
-
-            const data = await response.json();
-            sessionId = data.session_id;
-            history = data.history;
-            document.getElementById("question").value = "";
-            updateHistoryDisplay();
-        } catch (error) {
-            console.error("전송 실패:", error);
-            alert("문제가 발생했습니다: " + error.message);
+        if (!response.ok) {
+          throw new Error("서버 오류: " + response.status);
         }
-    }
 
+        const data = await response.json();
+        sessionId = data.session_id;
+        history = data.history;
+        document.getElementById("question").value = "";
+        updateHistoryDisplay();
+      } catch (error) {
+        console.error("전송 실패:", error);
+        alert("문제가 발생했습니다: " + error.message);
+      }
+    }
 
     function resetChat() {
       sessionId = null;
@@ -278,7 +283,6 @@ p {
       updateHistoryDisplay();
     }
 
-    // 초기화
     updateHistoryDisplay();
   </script>
 </body>
