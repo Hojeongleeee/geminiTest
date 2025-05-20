@@ -4,210 +4,213 @@
   <meta charset="UTF-8">
   <title>Gemini 챗봇</title>
   <style>
-/* 기본 스타일 */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 20px;
-  padding: 0 10px;
-  background-color: #fafafa;
-  color: #333;
-}
+    /* 기본 스타일 */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      padding: 0 10px;
+      background-color: #fafafa;
+      color: #333;
+    }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 2rem;
-}
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
 
-/* 채팅 박스 스타일 */
-.chat-box {
-  max-width: 800px;
-  margin: 0 auto 20px auto;
-  padding: 15px;
-  border: 1px solid #ccc;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  border-radius: 8px;
-}
+    .chat-box {
+      max-width: 800px;
+      margin: 0 auto 20px auto;
+      padding: 15px;
+      border: 1px solid #ccc;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
 
-textarea {
-  width: 100%;
-  min-height: 80px;
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  resize: vertical;
-  box-sizing: border-box;
-  transition: border-color 0.3s ease;
-}
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: vertical;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
 
-textarea:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0,123,255,0.5);
-}
+    textarea:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0,123,255,0.5);
+    }
 
-button {
-  padding: 10px 20px;
-  font-size: 1rem;
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff;
-  color: white;
-  margin-right: 10px;
-  transition: background-color 0.3s ease;
-}
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      margin-right: 10px;
+      transition: background-color 0.3s ease;
+    }
 
-button:hover {
-  background-color: #0056b3;
-}
+    button:hover {
+      background-color: #0056b3;
+    }
 
-button.reset {
-  background-color: #f44336;
-}
+    button.reset {
+      background-color: #f44336;
+    }
 
-button.reset:hover {
-  background-color: #c0392b;
-}
+    button.reset:hover {
+      background-color: #c0392b;
+    }
 
-/* 멀티턴 횟수 표시 */
-p {
-  margin-top: 10px;
-  font-weight: bold;
-  text-align: right;
-}
+    .turn-count {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: right;
+      font-size: 1rem;
+    }
 
-/* 채팅 내역 */
-.chat-history {
-  max-width: 800px;
-  margin: 0 auto;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  padding: 15px;
-  box-sizing: border-box;
-}
+    .chat-history {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 15px;
+      box-sizing: border-box;
+    }
 
-.message {
-  margin-bottom: 15px;
-  padding: 12px 15px;
-  border-left: 5px solid #007bff;
-  background-color: #f1f1f1;
-  border-radius: 4px;
-  word-break: break-word;
-  white-space: pre-wrap;
-  font-size: 1rem;
-}
+    .message {
+      margin-bottom: 15px;
+      padding: 12px 15px;
+      border-left: 5px solid #007bff;
+      background-color: #f1f1f1;
+      border-radius: 4px;
+      word-break: break-word;
+      white-space: pre-wrap;
+      font-size: 1rem;
+      text-align: left;
+    }
 
-/* 마크다운 렌더링용 스타일 */
-.message.answer {
-  border-color: #4caf50;
-  background-color: #e8f5e9;
-}
+    .message.answer {
+      border-color: #4caf50;
+      background-color: #e8f5e9;
+    }
 
-.message.answer p {
-  margin: 0 0 1em 0;
-  line-height: 1.5;
-  color: #2e2e2e;
-}
+    /* 마크다운 스타일 */
+    .message.answer p {
+      margin: 0 0 1em 0;
+      line-height: 1.5;
+      color: #2e2e2e;
+      text-align: left;
+    }
 
-.message.answer strong,
-.message.answer b {
-  font-weight: 700;
-}
+    .message.answer strong,
+    .message.answer b {
+      font-weight: 700;
+    }
 
-.message.answer em,
-.message.answer i {
-  font-style: italic;
-}
+    .message.answer em,
+    .message.answer i {
+      font-style: italic;
+    }
 
-.message.answer a {
-  color: #007bff;
-  text-decoration: none;
-}
+    .message.answer a {
+      color: #007bff;
+      text-decoration: none;
+    }
 
-.message.answer a:hover {
-  text-decoration: underline;
-}
+    .message.answer a:hover {
+      text-decoration: underline;
+    }
 
-.message.answer code {
-  background-color: #eee;
-  padding: 2px 5px;
-  border-radius: 3px;
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 0.9em;
-}
+    .message.answer code {
+      background-color: #eee;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9em;
+    }
 
-.message.answer pre {
-  background-color: #333;
-  color: #eee;
-  padding: 10px;
-  border-radius: 5px;
-  overflow-x: auto;
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 0.9em;
-  white-space: pre-wrap;
-}
+    .message.answer pre {
+      background-color: #333;
+      color: #eee;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9em;
+      white-space: pre-wrap;
+      text-align: left;
+    }
 
-.message.answer ul,
-.message.answer ol {
-  margin: 0 0 1em 1.5em;
-}
+    .message.answer ul,
+    .message.answer ol {
+      margin: 0 0 1em 1.5em;
+      text-align: left;
+    }
 
-.message.answer blockquote {
-  border-left: 4px solid #4caf50;
-  margin: 0 0 1em 0;
-  padding-left: 15px;
-  color: #555;
-  font-style: italic;
-  background-color: #e8f5e9;
-}
+    .message.answer blockquote {
+      border-left: 4px solid #4caf50;
+      margin: 0 0 1em 0;
+      padding-left: 15px;
+      color: #555;
+      font-style: italic;
+      background-color: #e8f5e9;
+      text-align: left;
+    }
 
-/* 반응형 조정 */
-@media (max-width: 768px) {
-  h1 {
-    font-size: 1.5rem;
-  }
+    /* 반응형 */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.5rem;
+      }
 
-  .chat-box, .chat-history {
-    padding: 10px;
-    margin: 0 10px 20px 10px;
-  }
+      .chat-box, .chat-history {
+        padding: 10px;
+        margin: 0 10px 20px 10px;
+      }
 
-  textarea {
-    min-height: 60px;
-    font-size: 0.9rem;
-  }
+      textarea {
+        min-height: 60px;
+        font-size: 0.9rem;
+      }
 
-  button {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    margin-right: 8px;
-  }
+      button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        margin-right: 8px;
+      }
 
-  p {
-    font-size: 0.9rem;
-  }
+      .turn-count {
+        font-size: 0.9rem;
+      }
 
-  .message {
-    font-size: 0.9rem;
-    padding: 10px 12px;
-  }
-}
+      .message {
+        font-size: 0.9rem;
+        padding: 10px 12px;
+      }
+    }
 
-@media (max-width: 480px) {
-  button {
-    width: 100%;
-    margin: 6px 0;
-  }
+    @media (max-width: 480px) {
+      button {
+        width: 100%;
+        margin: 6px 0;
+      }
 
-  .chat-box {
-    padding: 10px 5px;
-  }
-}
-</style>
+      .chat-box {
+        padding: 10px 5px;
+      }
+    }
+  </style>
 </head>
 <body>
   <h1>Gemini 챗봇</h1>
@@ -216,14 +219,13 @@ p {
     <textarea id="question" placeholder="질문을 입력하세요..." required></textarea>
     <button onclick="sendQuestion()">전송</button>
     <button class="reset" onclick="resetChat()">새로고침</button>
-    <p>현재 멀티턴 횟수: <span id="turn-count">0</span>/5</p>
+    <p class="turn-count">현재 멀티턴 횟수: <span id="turn-count">0</span>/5</p>
   </div>
 
   <div class="chat-history" id="chat-history"></div>
 
-  
   <script>
-    const API_URL = "https://geminitest-q151.onrender.com/ask";  // 실제 주소로 변경
+    const API_URL = "https://geminitest-q151.onrender.com/ask";  // 실제 API 주소
     let sessionId = null;
     let history = [];
 
@@ -234,13 +236,9 @@ p {
       history.forEach((item) => {
         const div = document.createElement("div");
         div.className = "message" + (item.type === "answer" ? " answer" : "");
-        if (item.type === "answer") {
-          div.innerHTML = marked.parse(item.content);  // 마크다운 → HTML 변환
-          turn++;
-        } else {
-          div.textContent = item.content;  // 질문은 그대로 텍스트
-        }
+        div.innerHTML = item.content;  // ✅ 마크다운 HTML 렌더링 허용
         container.appendChild(div);
+        if (item.type === "answer") turn++;
       });
       document.getElementById("turn-count").textContent = turn;
     }
@@ -283,6 +281,5 @@ p {
 
     updateHistoryDisplay();
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </body>
 </html>
