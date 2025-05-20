@@ -29,22 +29,23 @@ def save_session(session_id, history):
 
     response = supabase.table("chat_sessions").upsert(data).execute()
 
-    if response.error is None:
+    if response.data is not None:
         print("세션 저장 성공:", response.data)
         return True
     else:
-        print("세션 저장 실패:", response.error)
+        print("세션 저장 실패:", response)
         return False
+
 
 
 def get_session(session_id):
     response = supabase.table("chat_sessions").select("*").eq("id", session_id).execute()
 
-    if response.error is None and response.data:
+    if response.data and len(response.data) > 0:
         print("세션 불러오기 성공:", response.data)
-        return response.data[0]  # 리스트에서 첫 번째 항목
+        return response.data[0]  # 첫 번째 결과만 반환
     else:
-        print("세션 없음 또는 실패:", response.error)
+        print("세션 없음 또는 실패:", response)
         return None
 
 
