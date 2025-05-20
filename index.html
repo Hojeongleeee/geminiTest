@@ -46,25 +46,35 @@
     }
 
     async function sendQuestion() {
-      const question = document.getElementById("question").value.trim();
-      if (!question || history.length >= 10) return;
+        const question = document.getElementById("question").value.trim();
+        if (!question || history.length >= 10) return;
 
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          question: question,
-          session_id: sessionId,
-          history: history
-        })
-      });
+        try {
+            const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                question: question,
+                session_id: sessionId,
+                history: history
+            })
+            });
 
-      const data = await response.json();
-      sessionId = data.session_id;
-      history = data.history;
-      document.getElementById("question").value = "";
-      updateHistoryDisplay();
+            if (!response.ok) {
+            throw new Error("서버 오류: " + response.status);
+            }
+
+            const data = await response.json();
+            sessionId = data.session_id;
+            history = data.history;
+            document.getElementById("question").value = "";
+            updateHistoryDisplay();
+        } catch (error) {
+            console.error("전송 실패:", error);
+            alert("문제가 발생했습니다: " + error.message);
+        }
     }
+
 
     function resetChat() {
       sessionId = null;
