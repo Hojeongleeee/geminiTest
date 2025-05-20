@@ -50,4 +50,6 @@ def home():
     return "Gemini API 서버가 작동 중입니다."
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Render가 지정한 포트를 우선 사용
+    app.run(host="0.0.0.0", port=port)
+    # app.run(debug=True)
