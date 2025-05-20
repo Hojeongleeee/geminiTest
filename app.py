@@ -56,6 +56,8 @@ def ask():
     data = request.json
     question = data.get("question")
     session_id = data.get("session_id")
+    print("세션 ID:", session_id)  # Render 로그에서 확인 가능
+
 
     if not session_id:
         # 새 세션 생성
