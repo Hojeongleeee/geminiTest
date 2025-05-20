@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Gemini 챗봇</title>
   <style>
     /* 기본 스타일 */
@@ -219,13 +219,13 @@
     <textarea id="question" placeholder="질문을 입력하세요..." required></textarea>
     <button onclick="sendQuestion()">전송</button>
     <button class="reset" onclick="resetChat()">새로고침</button>
-    <p class="turn-count">현재 멀티턴 횟수: <span id="turn-count">0</span>/5</p>
+    <p>현재 멀티턴 횟수: <span id="turn-count">0</span>/5</p>
   </div>
 
   <div class="chat-history" id="chat-history"></div>
 
   <script>
-    const API_URL = "https://geminitest-q151.onrender.com/ask";  // 실제 API 주소
+    const API_URL = "https://geminitest-q151.onrender.com/ask";
     let sessionId = null;
     let history = [];
 
@@ -236,7 +236,7 @@
       history.forEach((item) => {
         const div = document.createElement("div");
         div.className = "message" + (item.type === "answer" ? " answer" : "");
-        div.innerHTML = item.content;  // ✅ 마크다운 HTML 렌더링 허용
+        div.textContent = item.content;
         container.appendChild(div);
         if (item.type === "answer") turn++;
       });
@@ -254,8 +254,8 @@
           body: JSON.stringify({
             question: question,
             session_id: sessionId,
-            history: history
-          })
+            history: history,
+          }),
         });
 
         if (!response.ok) {
@@ -274,11 +274,13 @@
     }
 
     function resetChat() {
-      sessionId = null;
-      history = [];
+      sessionId = null;                  // 세션ID 초기화
+      history = [];                      // 대화 기록 초기화
+      document.getElementById("turn-count").textContent = 0;  // 멀티턴 횟수 초기화
       updateHistoryDisplay();
     }
 
+    // 초기화
     updateHistoryDisplay();
   </script>
 </body>

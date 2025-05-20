@@ -1,22 +1,40 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import google.generativeai as genai
 import uuid
 import secrets
-import os  # 환경변수 불러오는 용도
-from flask_cors import CORS  # GitHub Pages에서 프론트 호출 허용
+import os
 
-# Gemini API 설정
-# genai.configure(api_key="YOUR_API_KEY")  # 실제 API 키로 변경 필요
+from supabase import create_client, Client
+
+# Gemini API 키 설정
 genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
+# Supabase 클라이언트 생성
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 app = Flask(__name__)
-CORS(app)  # 모든 도메인에서 API 호출 허용 (보안 필요시 제한 가능)
+CORS(app)
 app.secret_key = secrets.token_hex(24)
 
-# Gemini 모델
 model = genai.GenerativeModel("gemini-2.0-flash-001")
-chat_sessions = {}
+
+def get_session(session_id):
+    response = supabase.table("chat_sessions").select("*").eq("id", session_id).single().execute()
+    if response.error or response.data is None:
+        return None
+    return response.data
+
+def save_session(session_id, history):
+    data = {
+        "id": session_id,
+        "history": history
+    }
+    # upsert: 있으면 update, 없으면 insert
+    response = supabase.table("chat_sessions").upsert(data).execute()
+    return response.error is None
 
 @app.route("/ask", methods=["POST"])
 def ask():
@@ -24,21 +42,32 @@ def ask():
     question = data.get("question")
     session_id = data.get("session_id")
 
-    if not session_id or session_id not in chat_sessions:
-        chat = model.start_chat()
+    if not session_id:
+        # 새 세션 생성
         session_id = str(uuid.uuid4())
-        chat_sessions[session_id] = chat
-        history = []
+        chat = model.start_chat()
+        answer = chat.send_message(question).text
+        history = [
+            {"type": "question", "content": question},
+            {"type": "answer", "content": answer}
+        ]
+        save_session(session_id, history)
     else:
-        chat = chat_sessions[session_id]
-        history = data.get("history", [])
+        # 기존 세션 불러오기
+        session_data = get_session(session_id)
+        if not session_data:
+            # 세션 없으면 새로 시작
+            chat = model.start_chat()
+            history = []
+        else:
+            history = session_data.get("history", [])
+            # Gemini API가 요구하는 형식으로 히스토리 텍스트만 뽑아서 전달
+            chat = model.start_chat(history=[x["content"] for x in history if x["type"] in ("question", "answer")])
 
-    response = chat.send_message(question)
-    answer = response.text
-
-    # 새 대화 내역
-    history.append({"type": "question", "content": question})
-    history.append({"type": "answer", "content": answer})
+        answer = chat.send_message(question).text
+        history.append({"type": "question", "content": question})
+        history.append({"type": "answer", "content": answer})
+        save_session(session_id, history)
 
     return jsonify({
         "session_id": session_id,
@@ -47,9 +76,8 @@ def ask():
 
 @app.route("/")
 def home():
-    return "Gemini API 서버가 작동 중입니다."
+    return "Gemini 챗봇 서버 작동 중"
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Render가 지정한 포트를 우선 사용
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-    # app.run(debug=True)
