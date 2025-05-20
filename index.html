@@ -4,15 +4,151 @@
   <meta charset="UTF-8">
   <title>Gemini 챗봇</title>
   <style>
-    body { font-family: sans-serif; margin: 20px; }
-    .chat-box { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
-    textarea { width: 100%; padding: 10px; margin-bottom: 10px; }
-    button { padding: 8px 15px; cursor: pointer; }
-    .reset { background-color: #f44336; color: white; border: none; }
-    .chat-history { margin-top: 20px; }
-    .message { margin-bottom: 10px; padding: 10px; border-left: 4px solid #007bff; background: #f1f1f1; }
-    .answer { border-color: #4CAF50; background: #e8f5e9; }
-  </style>
+/* 기본 스타일 */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 20px;
+  padding: 0 10px;
+  background-color: #fafafa;
+  color: #333;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+/* 채팅 박스 스타일 */
+.chat-box {
+  max-width: 800px;
+  margin: 0 auto 20px auto;
+  padding: 15px;
+  border: 1px solid #ccc;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0,123,255,0.5);
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button.reset {
+  background-color: #f44336;
+}
+
+button.reset:hover {
+  background-color: #c0392b;
+}
+
+/* 멀티턴 횟수 표시 */
+p {
+  margin-top: 10px;
+  font-weight: bold;
+  text-align: right;
+}
+
+/* 채팅 내역 */
+.chat-history {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.message {
+  margin-bottom: 15px;
+  padding: 12px 15px;
+  border-left: 5px solid #007bff;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+  word-break: break-word;
+  white-space: pre-wrap;
+  font-size: 1rem;
+}
+
+.message.answer {
+  border-color: #4caf50;
+  background-color: #e8f5e9;
+}
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .chat-box, .chat-history {
+    padding: 10px;
+    margin: 0 10px 20px 10px;
+  }
+
+  textarea {
+    min-height: 60px;
+    font-size: 0.9rem;
+  }
+
+  button {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    margin-right: 8px;
+  }
+
+  p {
+    font-size: 0.9rem;
+  }
+
+  .message {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  button {
+    width: 100%;
+    margin: 6px 0;
+  }
+
+  .chat-box {
+    padding: 10px 5px;
+  }
+}
+</style>
 </head>
 <body>
   <h1>Gemini 챗봇</h1>
