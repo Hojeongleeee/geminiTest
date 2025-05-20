@@ -1,90 +1,79 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>Gemini Chatbot</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <style>
-        /* 기본적인 스타일 (필요에 따라 수정) */
-        body { font-family: sans-serif; margin: 20px; }
-        .chat-box { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
-        textarea { width: 80%; padding: 10px; margin-bottom: 10px; }
-        button { padding: 8px 15px; cursor: pointer; }
-        .reset { background-color: #f44336; color: white; border: none; }
-        .tabs { display: flex; flex-wrap: wrap; }
-        .tab { position: relative; width: 100%; /* 기본적으로 전체 너비 */ }
-        .tab label {
-            display: block;
-            padding: 10px;
-            background-color: #eee;
-            border: 1px solid #ccc;
-            cursor: pointer;
-            margin-right: 2px;
-            order: -1; /* 탭 레이블을 내용보다 먼저 배치 */
-        }
-        .tab input[type="radio"] {
-            position: absolute;
-            top: 0;
-            left: -9999px; /* 숨김 처리 */
-        }
-        .tab .content {
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-top: none;
-            order: 1;
-            width: 100%;
-            display: none;
-            white-space: pre-wrap; /* 줄바꿈 유지 */
-        }
-        .tab input:checked + label {
-            background-color: #ddd;
-            border-bottom: none;
-        }
-        .tab input:checked ~ .content {
-            display: block;
-        }
-        .question {
-            background-color: #f9f9f9;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-left: 3px solid #007bff;
-            white-space: pre-wrap;
-        }
-        @media (min-width: 600px) {
-            .tab { width: auto; } /* 넓은 화면에서는 탭 너비 자동 조정 */
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Gemini 챗봇</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    .chat-box { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; }
+    textarea { width: 100%; padding: 10px; margin-bottom: 10px; }
+    button { padding: 8px 15px; cursor: pointer; }
+    .reset { background-color: #f44336; color: white; border: none; }
+    .chat-history { margin-top: 20px; }
+    .message { margin-bottom: 10px; padding: 10px; border-left: 4px solid #007bff; background: #f1f1f1; }
+    .answer { border-color: #4CAF50; background: #e8f5e9; }
+  </style>
 </head>
 <body>
-    <h1>Gemini 챗봇</h1>
+  <h1>Gemini 챗봇</h1>
 
-    <div class="chat-box">
-        <form action="/ask" method="post">
-            <textarea name="question" placeholder="질문을 입력하세요..." required></textarea>
-            <button type="submit">전송</button>
-        </form>
-        <form action="/reset" method="post">
-            <button class="reset" type="submit">새로고침</button>
-        </form>
-        <p>현재 멀티턴 횟수: {{ turn_count }}/5</p>
-    </div>
+  <div class="chat-box">
+    <textarea id="question" placeholder="질문을 입력하세요..." required></textarea>
+    <button onclick="sendQuestion()">전송</button>
+    <button class="reset" onclick="resetChat()">새로고침</button>
+    <p>현재 멀티턴 횟수: <span id="turn-count">0</span>/5</p>
+  </div>
 
-    <div class="tabs">
-        {% for item in history_with_question %}
-            {% if item.type == 'question' %}
-                <div class="tab">
-                    <input type="radio" id="tab{{ loop.index0 }}" name="tab-group" {% if loop.first %}checked{% endif %}>
-                    <label for="tab{{ loop.index0 }}">질문 {{ loop.index // 2 + 1 }}</label>
-                    <div class="content question">{{ item.content }}</div>
-                </div>
-            {% elif item.type == 'answer' %}
-                <div class="tab">
-                    <input type="radio" id="tab{{ loop.index0 }}" name="tab-group">
-                    <label for="tab{{ loop.index0 }}">응답 {{ loop.index // 2 + 1 }}</label>
-                    <div class="content">{{ item.content | markdown | safe }}</div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    </div>
+  <div class="chat-history" id="chat-history"></div>
+
+  <script>
+    const API_URL = "https://geminitest-q151.onrender.com";  // 실제 주소로 변경
+    let sessionId = null;
+    let history = [];
+
+    function updateHistoryDisplay() {
+      const container = document.getElementById("chat-history");
+      container.innerHTML = "";
+      let turn = 0;
+      history.forEach((item, i) => {
+        const div = document.createElement("div");
+        div.className = "message" + (item.type === "answer" ? " answer" : "");
+        div.textContent = item.content;
+        container.appendChild(div);
+        if (item.type === "answer") turn++;
+      });
+      document.getElementById("turn-count").textContent = turn;
+    }
+
+    async function sendQuestion() {
+      const question = document.getElementById("question").value.trim();
+      if (!question || history.length >= 10) return;
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: question,
+          session_id: sessionId,
+          history: history
+        })
+      });
+
+      const data = await response.json();
+      sessionId = data.session_id;
+      history = data.history;
+      document.getElementById("question").value = "";
+      updateHistoryDisplay();
+    }
+
+    function resetChat() {
+      sessionId = null;
+      history = [];
+      updateHistoryDisplay();
+    }
+
+    // 초기화
+    updateHistoryDisplay();
+  </script>
 </body>
 </html>
