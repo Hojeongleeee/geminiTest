@@ -101,10 +101,70 @@ p {
   font-size: 1rem;
 }
 
-.message.answer {
-  border-color: #4caf50;
-  background-color: #e8f5e9;
-}
+
+  /* 마크다운 렌더링용 스타일 추가 */
+  .message.answer {
+    border-color: #4caf50;
+    background-color: #e8f5e9;
+  }
+
+  /* 마크다운 텍스트 스타일 */
+  .message.answer p {
+    margin: 0 0 1em 0;
+    line-height: 1.5;
+    color: #2e2e2e;
+  }
+
+  .message.answer strong,
+  .message.answer b {
+    font-weight: 700;
+  }
+
+  .message.answer em,
+  .message.answer i {
+    font-style: italic;
+  }
+
+  .message.answer a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  .message.answer a:hover {
+    text-decoration: underline;
+  }
+
+  .message.answer code {
+    background-color: #eee;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+  }
+
+  .message.answer pre {
+    background-color: #333;
+    color: #eee;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    white-space: pre-wrap; /* 줄바꿈 가능하게 */
+  }
+
+  .message.answer ul,
+  .message.answer ol {
+    margin: 0 0 1em 1.5em;
+  }
+
+  .message.answer blockquote {
+    border-left: 4px solid #4caf50;
+    margin: 0 0 1em 0;
+    padding-left: 15px;
+    color: #555;
+    font-style: italic;
+    background-color: #e8f5e9;
+  }
 
 /* 반응형 조정 */
 @media (max-width: 768px) {
