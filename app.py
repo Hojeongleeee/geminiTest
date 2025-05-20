@@ -49,15 +49,12 @@ def get_session(session_id):
         return None
 
 
-    
-
 @app.route("/ask", methods=["POST"])
 def ask():
     data = request.json
     question = data.get("question")
     session_id = data.get("session_id")
     print("세션 ID:", session_id)  # Render 로그에서 확인 가능
-
 
     if not session_id:
         # 새 세션 생성
@@ -73,13 +70,17 @@ def ask():
         # 기존 세션 불러오기
         session_data = get_session(session_id)
         if not session_data:
-            # 세션 없으면 새로 시작
             chat = model.start_chat()
             history = []
         else:
             history = session_data.get("history", [])
-            # Gemini API가 요구하는 형식으로 히스토리 텍스트만 뽑아서 전달
-            chat = model.start_chat(history=[x["content"] for x in history if x["type"] in ("question", "answer")])
+            # 🔧 수정된 부분: Gemini 형식으로 변환
+            chat_history = [
+                {"role": "user", "parts": [x["content"]]} if x["type"] == "question" else
+                {"role": "model", "parts": [x["content"]]}
+                for x in history if x["type"] in ("question", "answer")
+            ]
+            chat = model.start_chat(history=chat_history)
 
         answer = chat.send_message(question).text
         history.append({"type": "question", "content": question})
