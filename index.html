@@ -226,9 +226,9 @@
 
   <script>
     const API_URL = "https://geminitest-q151.onrender.com/ask";
-    let sessionId = null;
+    let sessionId = localStorage.getItem("gemini_session_id");  // 기존 세션ID 불러오기
     let history = [];
-
+    
     function updateHistoryDisplay() {
       const container = document.getElementById("chat-history");
       container.innerHTML = "";
@@ -243,42 +243,49 @@
       document.getElementById("turn-count").textContent = turn;
     }
 
-    async function sendQuestion() {
-      const question = document.getElementById("question").value.trim();
-      if (!question || history.length >= 10) return;
 
-      try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: question,
-            session_id: sessionId,
-            history: history,
-          }),
-        });
 
-        if (!response.ok) {
-          throw new Error("서버 오류: " + response.status);
-        }
+  async function sendQuestion() {
+    const question = document.getElementById("question").value.trim();
+    if (!question || history.length >= 10) return;
 
-        const data = await response.json();
-        sessionId = data.session_id;
-        history = data.history;
-        document.getElementById("question").value = "";
-        updateHistoryDisplay();
-      } catch (error) {
-        console.error("전송 실패:", error);
-        alert("문제가 발생했습니다: " + error.message);
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: question,
+          session_id: sessionId,
+          history: history
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("서버 오류: " + response.status);
       }
-    }
 
-    function resetChat() {
-      sessionId = null;                  // 세션ID 초기화
-      history = [];                      // 대화 기록 초기화
-      document.getElementById("turn-count").textContent = 0;  // 멀티턴 횟수 초기화
+      const data = await response.json();
+      sessionId = data.session_id;
+
+      // session_id를 localStorage에 저장
+      localStorage.setItem("gemini_session_id", sessionId);
+
+      history = data.history;
+      document.getElementById("question").value = "";
       updateHistoryDisplay();
+    } catch (error) {
+      console.error("전송 실패:", error);
+      alert("문제가 발생했습니다: " + error.message);
     }
+  }
+
+  function resetChat() {
+    sessionId = null;
+    history = [];
+    localStorage.removeItem("gemini_session_id");  // 저장된 세션 ID 제거
+    updateHistoryDisplay();
+  }
+
 
     // 초기화
     updateHistoryDisplay();
